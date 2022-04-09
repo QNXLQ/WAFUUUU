@@ -46,14 +46,10 @@ def rotv2rotm(rotv, result = "homogeneo"):
 def rotm2rotv(rotm):
     diag = rotm[0,0]+rotm[1,1]+rotm[2,2]
     theta = math.acos((diag-1)/2)
-    A = rotm[0,2] + rotm[2,0]
-    B = rotm[0,1] + rotm[1,0]
-    C = rotm[1,2] + rotm[2,1]
-    gama_cuad = A**2 * C**2 * theta**2 / (B**2 *(A**2 + C**2) + A**2 * C**2)
-    gama = math.sqrt(gama_cuad)
-    beta = gama *B / A
-    alpha = gama *B / C
-    return np.array([alpha, beta, gama]),theta
+    ry = (rotm[0,2] - rotm[2,0]) / 2 * theta / np.sin(theta)
+    rz = (rotm[0,1] - rotm[1,0]) / 2 * theta / np.sin(theta) 
+    rx = (rotm[2,1] - rotm[1,2]) / 2 * theta / np.sin(theta)
+    return np.array([rx, ry, rz])
 
 def rotm2rpy(rotm):
     pitch = math.asin(-rotm[2,0])
