@@ -47,7 +47,7 @@ def rotm2rotv(rotm):
     diag = rotm[0,0]+rotm[1,1]+rotm[2,2]
     theta = math.acos((diag-1)/2)
     ry = (rotm[0,2] - rotm[2,0]) / 2 * theta / np.sin(theta)
-    rz = (rotm[0,1] - rotm[1,0]) / 2 * theta / np.sin(theta) 
+    rz = (rotm[1,0] - rotm[0,1]) / 2 * theta / np.sin(theta) 
     rx = (rotm[2,1] - rotm[1,2]) / 2 * theta / np.sin(theta)
     return np.array([rx, ry, rz])
 
