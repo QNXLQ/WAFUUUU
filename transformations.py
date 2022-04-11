@@ -78,3 +78,25 @@ def qua2rotm(quaternion):
     m32 = 2 * qy * qz + 2 * qw * qx
     m33 = 1 - 2 * (qx ** 2) - 2 * (qy ** 2)
     return np.matrix([[m11, m12, m13], [m21, m22, m23], [m31, m32, m33]])
+
+def rotv2qua(rotv):
+    if rotv.size() > 3:
+        theta = math.sqrt(rotv[0,3] ** 2+ rotv[0,4] ** 2+ rotv[0,5] ** 2)
+        qw = math.cos(theta / 2)
+        qx = rotv[0, 3] / theta * asin(theta / 2)
+        qy = rotv[0, 4] / theta * asin(theta / 2)
+        qz = rotv[0, 5] / theta * asin(theta / 2)
+    else:
+        theta = math.sqrt(rotv[0,0] ** 2+ rotv[0,1] ** 2+ rotv[0,2] ** 2)
+        qw = math.cos(theta / 2)
+        qx = rotv[0, 0] / theta * asin(theta / 2)
+        qy = rotv[0, 1] / theta * asin(theta / 2)
+        qz = rotv[0, 2] / theta * asin(theta / 2)
+    return np.array([qx, qy, qz, qw])
+
+def qua2rotv(qua):
+    theta = 2 * acos(qua[0, 3])
+    kx = qua[0, 0] / math.sqrt(1 - qua[0, 3] ** 2)
+    ky = qua[0, 1] / math.sqrt(1 - qua[0, 3] ** 2)
+    kz = qua[0, 2] / math.sqrt(1 - qua[0, 3] ** 2)
+    return np.array([kx, ky, kz])
