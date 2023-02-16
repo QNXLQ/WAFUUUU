@@ -100,3 +100,6 @@ def qua2rotv(qua):
     ky = qua[0, 1] / math.sqrt(1 - qua[0, 3] ** 2)
     kz = qua[0, 2] / math.sqrt(1 - qua[0, 3] ** 2)
     return np.array([kx, ky, kz])
+
+def rpy2rotv(roll, pitch, yaw):
+	return qua2rotv(rpy2qua(roll, pitch, yaw))
