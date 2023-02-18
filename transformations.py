@@ -95,7 +95,7 @@ def rotv2qua(rotv):
     return np.array([qx, qy, qz, qw])
 
 def qua2rotv(qua):
-    theta = 2 * acos(qua[0, 3])
+    theta = 2 * math.acos(qua[0, 3])
     nx = qx / math.sin(theta/2)
     ny = qy / math.sin(theta/2)
     nz = qz / math.sin(theta/2)
