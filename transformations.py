@@ -96,10 +96,10 @@ def rotv2qua(rotv):
 
 def qua2rotv(qua):
     theta = 2 * acos(qua[0, 3])
-    kx = qua[0, 0] / math.sqrt(1 - qua[0, 3] ** 2)
-    ky = qua[0, 1] / math.sqrt(1 - qua[0, 3] ** 2)
-    kz = qua[0, 2] / math.sqrt(1 - qua[0, 3] ** 2)
-    return np.array([kx, ky, kz])
+    nx = qx / math.sin(theta/2)
+    ny = qy / math.sin(theta/2)
+    nz = qz / math.sin(theta/2)
+    return np.array([nx, ny, nz])
 
 def rpy2rotv(roll, pitch, yaw):
 	return qua2rotv(rpy2qua(roll, pitch, yaw))
