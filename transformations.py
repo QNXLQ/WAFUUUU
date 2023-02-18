@@ -83,15 +83,15 @@ def rotv2qua(rotv):
     if rotv.size() > 3:
         theta = math.sqrt(rotv[0,3] ** 2+ rotv[0,4] ** 2+ rotv[0,5] ** 2)
         qw = math.cos(theta / 2)
-        qx = rotv[0, 3] / theta * asin(theta / 2)
-        qy = rotv[0, 4] / theta * asin(theta / 2)
-        qz = rotv[0, 5] / theta * asin(theta / 2)
+        qx = rotv[0, 3] / theta * math.sin(theta / 2)
+        qy = rotv[0, 4] / theta * math.sin(theta / 2)
+        qz = rotv[0, 5] / theta * math.sin(theta / 2)
     else:
         theta = math.sqrt(rotv[0,0] ** 2+ rotv[0,1] ** 2+ rotv[0,2] ** 2)
         qw = math.cos(theta / 2)
-        qx = rotv[0, 0] / theta * asin(theta / 2)
-        qy = rotv[0, 1] / theta * asin(theta / 2)
-        qz = rotv[0, 2] / theta * asin(theta / 2)
+        qx = rotv[0, 0] / theta * math.sin(theta / 2)
+        qy = rotv[0, 1] / theta * math.sin(theta / 2)
+        qz = rotv[0, 2] / theta * math.sin(theta / 2)
     return np.array([qx, qy, qz, qw])
 
 def qua2rotv(qua):
