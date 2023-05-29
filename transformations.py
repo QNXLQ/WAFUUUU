@@ -1,10 +1,12 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
 import math
 import numpy as np
 
-def rpy2qua(roll, pitch, yaw):
+    
+def rpy2qua(rpy):
+    roll, pitch, yaw = rpy[0], rpy[1], rpy[2]
     qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) *np.sin(yaw/2)
     qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) *np.sin(yaw/2)
     qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) *np.cos(yaw/2)
@@ -46,16 +48,30 @@ def rotv2rotm(rotv, result = "homogeneo"):
 def rotm2rotv(rotm):
     diag = rotm[0,0]+rotm[1,1]+rotm[2,2]
     theta = math.acos((diag-1)/2)
-    ry = (rotm[0,2] - rotm[2,0]) / 2 * theta / np.sin(theta)
-    rz = (rotm[1,0] - rotm[0,1]) / 2 * theta / np.sin(theta) 
-    rx = (rotm[2,1] - rotm[1,2]) / 2 * theta / np.sin(theta)
-    return np.array([rx, ry, rz])
+    A = rotm[0,2] + rotm[2,0]
+    B = rotm[0,1] + rotm[1,0]
+    C = rotm[1,2] + rotm[2,1]
+    gama_cuad = A**2 * C**2 * theta**2 / (B**2 *(A**2 + C**2) + A**2 * C**2)
+    gama = math.sqrt(gama_cuad)
+    beta = gama *B / A
+    alpha = gama *B / C
+    return np.array([alpha, beta, gama]),theta
 
 def rotm2rpy(rotm):
-    pitch = math.asin(-rotm[2,0])
-    roll = math.acos(rotm[2,2]/ math.cos(pitch))
-    yaw = math.acos(rotm[0,0]/ math.cos(pitch))
+    pitch = math.asin(-rotm[2,0])	#ry
+    roll = math.acos(rotm[2,2]/ math.cos(pitch))	#rx
+    yaw = math.acos(rotm[0,0]/ math.cos(pitch))		#rz
     return np.array([roll, pitch, yaw])
+    
+def rpy2rotm(rpy):
+    rx = rpy[0]
+    ry = rpy[1]
+    rz = rpy[2]
+    rotx = np.matrix([[1, 0, 0], [0, np.cos(rx), -np.sin(rx)], [0, np.sin(rx), np.cos(rx)]])
+    roty = np.matrix([[np.cos(ry), 0, np.sin(ry)], [0, 1, 0], [-np.sin(ry), 0, np.cos(ry)]])
+    rotz = np.matrix([[np.cos(rz), -np.sin(rz), 0], [np.sin(rz), np.cos(rz), 0], [0, 0, 1]])
+    rotm = rotz*roty*rotx
+    return rotm
     
 def rotm2qua(rotm):
     rotm = rotm[0:3,0:3]
@@ -67,7 +83,10 @@ def rotm2qua(rotm):
     return np.array([x, y, z, w])
 
 def qua2rotm(quaternion):
-    qx, qy, qz, qw = quaternion[0,0], quaternion[0,1], quaternion[0,2], quaternion[0,3]
+    qx = quaternion[0]
+    qy = quaternion[1]
+    qz = quaternion[2]
+    qw = quaternion[3]
     m11 = 1 - 2 * (qy ** 2) - 2 * (qz ** 2)
     m12 = 2 * qx * qy - 2 * qw * qz
     m13 = 2 * qx * qz + 2 * qw * qy
@@ -78,28 +97,10 @@ def qua2rotm(quaternion):
     m32 = 2 * qy * qz + 2 * qw * qx
     m33 = 1 - 2 * (qx ** 2) - 2 * (qy ** 2)
     return np.matrix([[m11, m12, m13], [m21, m22, m23], [m31, m32, m33]])
-
-def rotv2qua(rotv):
-    if rotv.size() > 3:
-        theta = math.sqrt(rotv[0,3] ** 2+ rotv[0,4] ** 2+ rotv[0,5] ** 2)
-        qw = math.cos(theta / 2)
-        qx = rotv[0, 3] / theta * math.sin(theta / 2)
-        qy = rotv[0, 4] / theta * math.sin(theta / 2)
-        qz = rotv[0, 5] / theta * math.sin(theta / 2)
-    else:
-        theta = math.sqrt(rotv[0,0] ** 2+ rotv[0,1] ** 2+ rotv[0,2] ** 2)
-        qw = math.cos(theta / 2)
-        qx = rotv[0, 0] / theta * math.sin(theta / 2)
-        qy = rotv[0, 1] / theta * math.sin(theta / 2)
-        qz = rotv[0, 2] / theta * math.sin(theta / 2)
-    return np.array([qx, qy, qz, qw])
-
-def qua2rotv(qua):
-    theta = 2 * math.acos(qua[0, 3])
-    nx = qx / math.sin(theta/2)
-    ny = qy / math.sin(theta/2)
-    nz = qz / math.sin(theta/2)
+    
+def qua2rotv(quaternion):
+    theta = 2*math.acos(qua[3])
+    nx = quaternion[0]/math.sin(theta/2)
+    ny = quaternion[1]/math.sin(theta/2)
+    nz = quaternion[2]/math.sin(theta/2)
     return np.array([nx, ny, nz])
-
-def rpy2rotv(roll, pitch, yaw):
-	return qua2rotv(rpy2qua(roll, pitch, yaw))
